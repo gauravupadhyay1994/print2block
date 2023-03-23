@@ -24,19 +24,19 @@ function expandBinomial(n) {
   const coeffArr = binomialCoeff(n);
   let result = "";
   for (let i = n; i > 0; i--) {
-    let term = "";
+    let val = "";
     if (coeffArr[i] !== 1) {
-      term += coeffArr[i].toString();
+      val += coeffArr[i].toString();
     }
     if (i > 1) {
-      term += "x^" + i.toString();
+      val += "x^" + i.toString();
     } else {
-      term += "x";
+      val += "x";
     }
     if (result !== "") {
       result += " + ";
     }
-    result += term;
+    result += val;
   }
   return result + " + 1";
 }
