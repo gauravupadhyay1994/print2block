@@ -1,5 +1,4 @@
 import { Box, Text } from "@chakra-ui/layout";
-import { ChatState } from "../../context/ChatProvider";
 const UserListItem = ({ user, handleFunction }) => {
   return (
     <Box
