@@ -41,13 +41,6 @@ const Login = () => {
         config
       );
 
-      toast({
-        title: "Login Successful",
-        status: "success",
-        duration: 5000,
-        isClosable: true,
-        position: "bottom",
-      });
       localStorage.setItem("userInfo", JSON.stringify(data));
       history.push("/chats");
     } catch (error) {
