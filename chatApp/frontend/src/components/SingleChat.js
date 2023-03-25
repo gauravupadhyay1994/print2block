@@ -9,14 +9,25 @@ import { Input } from "@chakra-ui/input";
 import axios from "axios";
 import "../components/avatars/styles.css";
 import ScrollableChat from "./ScrollableChat";
+import io from "socket.io-client";
+
+const ENDPOINT = "http://localhost:8000";
+var socket, selectedChatCompare;
 
 const SingleChat = ({ fetchAgain, setFetchAgain }) => {
   const { selectedChat, setSelectedChat, user } = ChatState();
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [newMessage, setNewMessage] = useState("");
+  const [socketConnected, setSocketConnected] = useState(false);
 
   const toast = useToast();
+
+  useEffect(() => {
+    socket = io(ENDPOINT);
+    socket.emit("setup", user);
+    socket.on("connected", () => setSocketConnected(true));
+  }, []);
 
   const sendMessage = async (event) => {
     if (event.key === "Enter" && newMessage) {
@@ -36,6 +47,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
           },
           config
         );
+        socket.emit("new message", data);
         setMessages([...messages, data]);
       } catch (error) {
         toast({
@@ -70,6 +82,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
       );
       setMessages(data);
       setLoading(false);
+      socket.emit("join chat", selectedChat._id);
     } catch (error) {
       toast({
         title: "Error Occured!",
@@ -83,7 +96,20 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
   };
   useEffect(() => {
     fetchMessages();
+    selectedChatCompare = selectedChat;
   }, [selectedChat]);
+
+  useEffect(() => {
+    socket.on("message recieved", (newMessageRecieved) => {
+      if (
+        !selectedChatCompare || // if chat is not selected or doesn't match current chat
+        selectedChatCompare._id !== newMessageRecieved.chat._id
+      ) {
+      } else {
+        setMessages([...messages, newMessageRecieved]);
+      }
+    });
+  });
   return (
     <>
       {selectedChat ? (
